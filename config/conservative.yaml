@@ -1,0 +1,37 @@
+# config/conservative.yaml
+# Configuration conservative pour Grid Bot SOL
+# Testée sur période bear market (Oct 2021 - Dec 2022)
+
+trading:
+  symbol: "SOL-USD"
+  initial_capital: 1000        # Starting capital in USD
+  grid_size: 5                 # Number of grid levels (conservative)
+  grid_ratio: 0.05             # 5% spacing (plus large pour éviter over-trading)
+  leverage: 1.2                # 1.2x seulement (ultra safe)
+  max_positions: 3             # Limit active positions
+  position_size: 0.12          # 12% par position (réduit)
+  trading_fee: 0.001           # 0.1% Bitget fee
+
+risk_management:
+  maintenance_margin: 0.08     # 8% margin requirement
+  safety_buffer: 2.0           # 100% buffer = 2x margin (au lieu de 1.3)
+  max_drawdown: 0.20           # 20% au lieu de 15%
+  emergency_stop_loss: 0.02    # 2% emergency stop
+  volatility_window: 20        # Days for volatility calculation
+  volatility_threshold: 1.2    # Multiplier for adaptive grid
+  atr_period: 14               # ATR period for stops
+
+optimization:
+  enabled: false               # Disable for first run
+  grid_ratio_range: [0.02, 0.05]
+  leverage_range: [1.0, 2.0]
+  position_size_range: [0.1, 0.2]
+  
+logging:
+  level: "INFO"
+  file: "logs/backtest.log"
+  
+backtest:
+  plot: true
+  save_results: true
+  output_dir: "results/"

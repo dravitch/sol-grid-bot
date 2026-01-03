@@ -1,0 +1,91 @@
+# Data files
+data/*.csv
+data/*.parquet
+data/*.json
+!data/README.md
+!data/.gitkeep
+
+# Results
+results/*.csv
+results/*.png
+results/*.json
+!results/.gitkeep
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+.env
+.direnv
+.pre-commit-config.yaml
+.envrc
+*.nix
+.ruff_cache
+.gitkeep
+.git
+justfile
+reset_publish.sh
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+new_outputs.txt
+recap-*.md
+errors_*.md
+Test_Workflow2.txt
+promp_corrections.md
+
+# Config secrets (if any)
+config/secrets.yaml
+config/local.yaml
+*.key
+*.pem
