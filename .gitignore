@@ -43,7 +43,6 @@ ENV/
 .direnv
 .pre-commit-config.yaml
 .envrc
-*.nix
 .ruff_cache
 .gitkeep
 .git

@@ -12,6 +12,11 @@ from typing import Dict, Optional
 import pandas as pd
 import numpy as np
 
+import sys
+from pathlib import Path
+sys.path.append(str(Path(__file__).parent.parent))  # ajoute la racine au path
+#from src.utils.exchange_simulator import ExchangeSimulator
+
 from exchange_simulator import ExchangeSimulator
 from src.core.grid_bot import GridBotV3
 

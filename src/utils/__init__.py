@@ -4,5 +4,4 @@
 """
 Utilitaires divers
 """
-
 __all__ = []

@@ -6,7 +6,7 @@ This directory contains historical price data for backtesting.
 
 ```bash
 # SOL/USD 2021-2022 (used in examples)
-python -c "import yfinance as yf; yf.download('SOL-USD', start='2021-10-31', end='2022-12-31').to_csv('data/SOL_2021_2022.csv')"
+python scripts/fetch_sol_data.py --start 2021-10-31 --end 2022-12-31
 ```
 
 ## Manual Download
