@@ -1,0 +1,49 @@
+# Optimized Configuration
+# Basé sur optimize_extreme.py results (new_outputs2.txt)
+# Top performer: +287% SOL, 0 liquidations, 88% win rate
+
+trading:
+  symbol: "SOL/USDT"
+  initial_capital: 1000
+  leverage: 20.0
+  maker_fee: 0.0002
+  taker_fee: 0.0005
+  funding_rate: 0.0
+
+grid_strategy:
+  grid_size: 50
+  grid_ratio: 0.03
+  max_position_size: 0.30
+  adaptive_spacing: true
+  min_grid_distance: 0.01
+  max_simultaneous_positions: 10
+  rebalance_threshold: 0.03
+
+risk_management:
+  max_portfolio_drawdown: 0.30
+  max_position_drawdown: 0.15
+  maintenance_margin: 0.05
+  safety_buffer: 1.5
+  min_liquidation_distance: 0.15
+  volatility_lookback: 20
+  adaptive_leverage_enabled: false
+  leverage_multiplier_low: 1.0
+  leverage_multiplier_high: 1.0
+
+performance:
+  target_asset_growth: 287
+  max_drawdown_acceptable: 0
+  min_sharpe_ratio: 1.60
+  benchmark_comparison: true
+
+# Metadata from optimization
+optimization_results:
+  sol_change_pct: 287.3
+  usd_return_pct: -81.1
+  total_trades: 25
+  win_rate: 88.0
+  max_drawdown: 0.0
+  liquidations: 0
+  sharpe_ratio: 1.60
+  optimized_on: "2021-10-31 to 2022-12-30"
+  market_condition: "declining (-95%)"
