@@ -18,9 +18,11 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, Optional
 
-# === CORRECTION IMPORT : Ajout racine au PYTHONPATH ===
+# === CORRECTION IMPORT : Ajout racine projet ET scripts/ au PYTHONPATH ===
 project_root = Path(__file__).parent.parent.resolve()
+scripts_dir = Path(__file__).parent.resolve()
 sys.path.insert(0, str(project_root))
+sys.path.insert(0, str(scripts_dir))  # Pour exchange_simulator.py
 
 # Configuration logging (doit venir après les imports de base)
 logging.basicConfig(
@@ -85,8 +87,8 @@ Examples:
     parser.add_argument(
         "--sleep",
         type=float,
-        default=0.3,
-        help="Délai entre cycles en secondes (default: 0.3)",
+        default=0.0,
+        help="Délai entre cycles en secondes (default: 0.0 = replay rapide)",
     )
 
     parser.add_argument(
