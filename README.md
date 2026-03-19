@@ -1,349 +1,301 @@
-# 🤖 SOL Grid Bot
+# SOL Grid Bot
 
-**Automated grid trading bot for SOL/USDT with backtesting, optimization, and paper trading.**
+**Automated SHORT grid trading bot for SOL/USDT with backtesting, optimization, and paper trading.**
 
 [![Python](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Status](https://img.shields.io/badge/status-experimental-orange.svg)]()
+[![Status](https://img.shields.io/badge/status-v0.2.0--beta-blue.svg)]()
 
 ---
 
-## ⚡ Quick Start
+## Status des composants
+
+| Composant | Statut | Description |
+|-----------|--------|-------------|
+| `GridBotV3` — moteur core | ✅ Opérationnel | Stratégie grid SHORT, levier adaptatif |
+| `paper_trade.py` | ✅ Opérationnel | Replay historique, simulateur exchange |
+| `backtest.py` | ✅ Opérationnel | Backtesting avec graphiques |
+| `run_optimization_lp.py` | ✅ Opérationnel | Optimisation silencieuse + analyse patterns |
+| `config_loader.py` | ✅ Opérationnel | Chargement YAML robuste avec dataclasses |
+| `data_loader.py` | ✅ Opérationnel | CSV + validation OHLC + adaptation timeframe |
+| Exchange Simulator | ✅ Opérationnel | Ordres virtuels, PnL, positions |
+| Live exchange | ⏳ Non implémenté | Roadmap v0.3.0 |
+
+**Fonctionnalité globale : ~95% opérationnel** (v0.1.0 était 70%)
+
+---
+
+## Démarrage rapide
 
 ```bash
-# 1. Clone
+# 1. Cloner
 git clone https://github.com/YOUR_USERNAME/sol-grid-bot.git
 cd sol-grid-bot
 
-# 2. Install
+# 2. Installer les dépendances
 pip install -r requirements.txt
 
-# 3. Download data
-python -c "import yfinance as yf; yf.download('SOL-USD', start='2021-10-31', end='2022-12-31').to_csv('data/SOL_2021_2022.csv')"
+# 3. Générer les données de test (SOL bear market 2021-2022)
+python data/generate_test_data.py
+# Alternative : télécharger depuis Yahoo Finance
+# python data/fetch_sol_yahoo.py
 
-# 4. Run backtest
-python scripts/backtest.py --data data/SOL_2021_2022.csv
+# 4. Backtester
+python scripts/backtest.py --data data/SOL_2021_2022.csv --leverage 8
 
-# 5. Optimize parameters
-python scripts/optimize.py --data data/SOL_2021_2022.csv
+# 5. Paper trader
+python scripts/paper_trade.py --data data/SOL_2021_2022.csv
 
-# 6. Paper trade (simulation)
-python scripts/paper_trade.py
+# 6. Optimiser les paramètres
+python scripts/run_optimization_lp.py
 ```
 
 ---
 
-## 📖 What is Grid Trading?
+## Qu'est-ce que le Grid Trading ?
 
-Grid trading is a strategy that places buy and sell orders at regular intervals around a base price. This bot:
+Le grid trading place des ordres d'achat/vente à intervalles réguliers autour d'un prix de base. Ce bot :
 
-- **Opens SHORT positions** when price rises (sells high)
-- **Closes positions** when price drops to take profit (buys low)
-- **Uses leverage** to amplify returns (8x by default)
-- **Manages risk** with liquidation price calculations
+- **Ouvre des positions SHORT** quand le prix monte (vend haut)
+- **Ferme les positions** quand le prix baisse pour prendre le profit (achète bas)
+- **Utilise le levier** pour amplifier les rendements (5x par défaut)
+- **Gère le risque** avec calcul de prix de liquidation et limites de drawdown
 
-**Best for**: Range-bound or declining markets (like SOL 2021-2022: -95%)
-
----
-
-## 🎯 Features
-
-| Feature | Description | Script |
-|---------|-------------|--------|
-| **Backtesting** | Test strategy on historical data | `backtest.py` |
-| **Optimization** | Find best parameters (grid size, leverage, etc.) | `optimize.py` |
-| **Paper Trading** | Simulate live trading with virtual funds | `paper_trade.py` |
-| **Risk Management** | Liquidation price, drawdown limits, position sizing | Built-in |
+**Idéal pour** : marchés baissiers ou en range (ex. SOL 2021-2022 : -95%)
 
 ---
 
-## 📊 Architecture
+## Architecture
 
 ```
 sol-grid-bot/
 ├── scripts/
-│   ├── backtest.py          # Historical backtesting
-│   ├── optimize.py          # Parameter optimization
-│   └── paper_trade.py       # Paper trading simulator
+│   ├── backtest.py              # Backtesting historique
+│   ├── paper_trade.py           # Paper trading (replay)
+│   ├── run_optimization_lp.py   # Optimisation silencieuse + analyse patterns
+│   └── exchange_simulator.py    # Simulateur d'exchange virtuel
 │
 ├── src/
 │   ├── core/
-│   │   └── grid_bot.py      # GridBotV3 strategy
-│   └── config/
-│       └── config_loader.py # YAML config loader
+│   │   ├── grid_bot.py          # GridBotV3 — stratégie principale
+│   │   ├── grid_strategy.py     # Stratégie simplifiée
+│   │   ├── portfolio.py         # Gestion de portefeuille
+│   │   └── risk_manager.py      # Gestion du risque
+│   ├── config/
+│   │   └── config_loader.py     # Chargeur YAML + dataclasses
+│   └── analysis/
+│       ├── sol_metrics.py       # Métriques SOL
+│       └── benchmarks.py        # Buy&Hold / Sell&Hold
+│
+├── data/
+│   ├── data_loader.py           # Chargeur CSV robuste + validation OHLC
+│   ├── generate_test_data.py    # Génère données synthétiques SOL
+│   └── fetch_sol_yahoo.py       # Télécharge depuis Yahoo Finance
 │
 ├── config/
-│   └── default.yaml         # Default parameters
+│   ├── default.yaml             # Paramètres par défaut
+│   ├── conservative.yaml        # Levier bas, grilles larges
+│   ├── aggressive.yaml          # Levier élevé, grilles serrées
+│   └── optimized.yaml           # Résultats d'optimisation
 │
-├── exchange_simulator.py    # Virtual exchange for paper trading
-├── data/                    # Historical price data
-└── results/                 # Optimization results, charts
+└── results_lp_silent/           # Résultats d'optimisation (généré)
 ```
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
-Edit `config/default.yaml` to customize strategy:
+Éditez `config/default.yaml` :
 
 ```yaml
 trading:
-  initial_capital: 1000      # Starting capital (USD)
-  leverage: 8                # Leverage multiplier
-  symbol: "SBTC/SUSDT:SUSDT"
+  initial_capital: 1000      # Capital initial (USD)
+  leverage: 5                # Multiplicateur de levier
+  symbol: "SOL/USDT"
 
 grid_strategy:
-  grid_size: 7               # Number of grid levels
-  grid_ratio: 0.02           # 2% spacing between grids
-  max_position_size: 0.3     # Max 30% capital per position
+  grid_size: 7               # Nombre de niveaux de grille
+  grid_ratio: 0.03           # 3% d'espacement entre grilles
+  max_position_size: 0.25    # Max 25% du capital par position
+  max_simultaneous_positions: 5
 
 risk_management:
-  max_portfolio_drawdown: 0.30      # Stop if 30% loss
-  maintenance_margin: 0.05          # Exchange margin requirement
-  min_liquidation_distance: 0.15    # Safety buffer
+  max_portfolio_drawdown: 0.30   # Stop si 30% de perte
+  maintenance_margin: 0.05       # Marge de maintenance exchange
+  safety_buffer: 1.5             # Buffer liquidation (×1.5)
+  adaptive_leverage:
+    enabled: false               # Levier adaptatif selon volatilité
 ```
 
-**Key Parameters**:
-- `grid_size`: More grids = more trades, more fees
-- `grid_ratio`: Wider spacing = fewer trades, bigger moves needed
-- `leverage`: Higher = more profit/loss, higher liquidation risk
-- `max_position_size`: Risk per trade (30% = conservative)
+**Paramètres clés** :
+- `grid_size` : plus de grilles = plus de trades, plus de frais
+- `grid_ratio` : espacement plus large = moins de trades, mouvements plus grands
+- `leverage` : plus élevé = plus de gain/perte, risque de liquidation plus élevé
+- `safety_buffer` : distance de sécurité avant liquidation
 
 ---
 
-## 🚀 Usage
+## Utilisation
 
-### 1. Backtest Strategy
-
-Test on historical data to see performance:
+### 1. Backtest
 
 ```bash
 python scripts/backtest.py --data data/SOL_2021_2022.csv --leverage 8
+
+# Analyse de frontière (teste leverage 1x à 20x)
+python scripts/backtest.py --data data/SOL_2021_2022.csv --frontier
 ```
 
-**Output**:
-```
-📊 SOL METRICS:
-   Initial SOL:    4.9402
-   Final SOL:      19.1316 (+287.3%)
-   USD Value:      $189.02 (-81.1% from $1000)
-   Total Trades:   25
-   Win Rate:       88.0%
-   Max Drawdown:   0.0%
-   Liquidations:   0
-```
+**Résultats typiques (SOL 2021-2022, -97%)** :
 
-**Interpretation**:
-- ✅ SOL accumulation: 287% more SOL
-- ⚠️ USD loss: Market dropped 95%, bot lost 81% (better than buy&hold)
-- ✅ No liquidations = safe leverage usage
+| Stratégie | Variation SOL | Retour USD | Trades | Liquidations |
+|-----------|--------------|------------|--------|--------------|
+| **Grid Bot (5x)** | +1051% | -60% | 72 | 0 |
+| Buy & Hold | -97% | -97% | 0 | — |
+| Sell & Hold | +3233% | +670% | 0 | — |
 
 ---
 
-### 2. Optimize Parameters
-
-Find best configuration for your data:
+### 2. Paper Trading
 
 ```bash
-python scripts/optimize.py --data data/SOL_2021_2022.csv
+# Replay rapide (données historiques)
+python scripts/paper_trade.py --data data/SOL_2021_2022.csv
+
+# Config agressive
+python scripts/paper_trade.py --config config/aggressive.yaml
+
+# Avec délai entre cycles (pour observation)
+python scripts/paper_trade.py --sleep 0.1
 ```
 
-Tests 1000 combinations of:
-- `grid_size`: 3-50
-- `grid_ratio`: 0.01-0.50
-- `leverage`: 1-20x
-- `max_position_size`: 0.1-1.0
-
-**Output**: `results/optimization_YYYYMMDD_HHMMSS.csv`
-
-**Top performers**:
+**Output** :
 ```
-🏆 #1: grid_size=50, grid_ratio=0.03, leverage=20x → +287% SOL
-🏆 #2: grid_size=30, grid_ratio=0.03, leverage=15x → +264% SOL
-🏆 #3: grid_size=10, grid_ratio=0.03, leverage=20x → +257% SOL
-```
-
-⚠️ **Warning**: Past performance ≠ future results. Always paper trade first.
-
----
-
-### 3. Paper Trade (Simulation)
-
-Test strategy in real-time simulation without risk:
-
-```bash
-python scripts/paper_trade.py
-```
-
-**Runs on historical data** with:
-- Virtual $1000 capital
-- Real order execution simulation
-- Slippage and fees included
-- Live equity tracking
-
-**Output**:
-```
-Cycle 1/426 | Prix $202.42 | Cash $1000 | Equity $1000
-✅ BUY 1.482060 @ $195.49 ($289.72)
-🔴 SELL 1.482060 @ $155.21 | PnL: $-59.69 (-20.60%)
+CYCLE 1 | Prix $265.17 | Signal: HOLD | Cash: $1000.00 | Equity: $1000.00
+✅ BUY 0.942792 @ $261.16 ($246.22)
+🔴 SELL 0.942792 @ $184.87 | PnL: -$71.93 (-29.21%)
 ...
-📊 RÉSUMÉ FINAL:
-   Equity finale: $741.27
-   PnL: -258.73 USD (-25.87%)
+RÉSUMÉ FINAL PAPER TRADING
+💰 Equity finale: $424.57
+📊 PnL: -575.43 USD (-57.54%)
 ```
 
 ---
 
-## 📈 Example Results
+### 3. Optimisation des paramètres
 
-**Backtest on SOL 2021-2022** (market -95%):
+```bash
+python scripts/run_optimization_lp.py
+```
 
-| Strategy | SOL Change | USD Return | Trades | Liquidations |
-|----------|-----------|------------|--------|--------------|
-| **Grid Bot (8x)** | +287% | -81% | 25 | 0 |
-| Buy & Hold | -95% | -95% | 0 | - |
-| Sell & Hold | +1212% | +285% | 0 | - |
+Teste ~15 000 combinaisons de :
+- `leverage` : 3–10x
+- `grid_size` : 5, 7, 10, 15, 20
+- `grid_ratio` : 0.015–0.035
+- `max_position_size` : 0.15–0.35
+- `max_portfolio_drawdown` : 0.25–0.45
+- `safety_buffer` : 1.2–3.0
 
-**Key Insight**: Grid bot accumulated 287% more SOL while market crashed. In a recovery, this would massively outperform.
+**Fichiers générés** dans `results_lp_silent/` :
+- `top_100_configurations.csv` — top 100 par score composite
+- `winning_patterns_analysis.json` — patterns des configs gagnantes
+- `parameter_performance_analysis.csv` — performance par paramètre
+- `lp_optimization_complete_*.csv` — résultats complets
+
+**Reprise automatique** : interrompez avec `Ctrl+C`, relancez → reprend depuis le checkpoint.
 
 ---
 
-## 🛡️ Risk Management
+### 4. Charger des données custom
 
-The bot includes multiple safety mechanisms:
+```python
+from data.data_loader import DataLoader
 
-1. **Liquidation Price Calculation**
-   - Maintains safety buffer (50% by default)
-   - Monitors distance to liquidation continuously
-
-2. **Position Sizing**
-   - Never risks more than `max_position_size` per trade
-   - Reduces size as positions accumulate
-
-3. **Drawdown Limits**
-   - Stops trading if portfolio drawdown > 30%
-   - Emergency stop-loss at 15% (optional)
-
-4. **Adaptive Spacing**
-   - Adjusts grid spacing based on volatility
-   - Wider grids in high volatility = safer
-
-⚠️ **Important**: Leverage amplifies both gains AND losses. Start with low leverage (2-3x) in paper trading.
+df = DataLoader.load_csv("data/mon_fichier.csv")
+quality = DataLoader.validate_data_quality(df)
+timeframe = DataLoader.infer_timeframe(df)
+```
 
 ---
 
-## 📚 How It Works
+## Gestion du risque
 
-### Grid Strategy Flow
+Le bot inclut plusieurs mécanismes de sécurité :
 
-```
-1. Market Price: $200
-2. Create grid levels: $196, $192, $188, $184, $180, $176, $172
-3. Price rises to $196 → OPEN SHORT (sell high)
-4. Price drops to $192 → CLOSE SHORT (buy low, take profit)
-5. Repeat for each grid level
-```
+1. **Prix de liquidation** — buffer de sécurité configurable (`safety_buffer`)
+2. **Taille de position** — réduite progressivement avec le nombre de positions ouvertes
+3. **Limite de drawdown** — arrêt si perte > `max_portfolio_drawdown`
+4. **Levier adaptatif** — réduit en haute volatilité (optionnel)
 
-### SHORT Position Example
-
-```
-Entry: $196 (sell)
-Exit:  $192 (buy)
-Profit: $4 per SOL
-With 8x leverage: $32 profit on $196 collateral
-ROI: 16.3% per trade
-```
-
-**Why SHORT?**
-- Grid bots profit from volatility
-- In declining markets, SHORT positions capture downward moves
-- Each bounce = profit opportunity
+> **Important** : Le levier amplifie gains ET pertes. Commencer avec 2–3x en paper trading.
 
 ---
 
-## 🧪 Development Status
+## Comment ça fonctionne
 
-**Current Version**: v0.1.0 (Experimental)
+```
+Prix marché : $200
+Niveaux de grille : $194, $188, $182, $176, $170, $164, $158
 
-**Tested On**:
-- SOL/USD historical data (2021-2022)
-- 1000+ parameter combinations
-- Paper trading with virtual exchange
-
-**Known Limitations**:
-- No live exchange integration yet (paper trading only)
-- Optimized for declining/sideways markets
-- Requires manual parameter tuning per market
-
-**Roadmap**:
-- [ ] Live exchange connectors (Binance, Bitget)
-- [ ] Dynamic parameter adjustment
-- [ ] Multi-asset support
-- [ ] Web dashboard for monitoring
-- [ ] Telegram alerts
+Prix monte à $194 → OUVRE SHORT (vend haut)
+Prix descend à $188 → FERME SHORT (achète bas, prend profit)
+Profit : $6/SOL × levier × taille de position
+Répété pour chaque niveau de grille
+```
 
 ---
 
-## 📋 Requirements
+## Prérequis
 
-```txt
+```
 pandas>=2.0.0
 numpy>=1.24.0
 pyyaml>=6.0
 matplotlib>=3.7.0
 tqdm>=4.65.0
-yfinance>=0.2.0  # For data download
+yfinance>=0.2.0   # Pour fetch_sol_yahoo.py uniquement
 ```
 
-**Python**: 3.11 or higher
+**Python** : 3.11+
 
 ---
 
-## 🤝 Contributing
+## Roadmap
 
-This is an educational project. Contributions welcome:
-
-1. Fork the repo
-2. Create feature branch: `git checkout -b feature/my-feature`
-3. Commit changes: `git commit -m "Add my feature"`
-4. Push: `git push origin feature/my-feature`
-5. Open Pull Request
-
----
-
-## ⚠️ Disclaimer
-
-**THIS SOFTWARE IS FOR EDUCATIONAL PURPOSES ONLY.**
-
-- **NOT FINANCIAL ADVICE**: Do not use real money without thorough testing.
-- **HIGH RISK**: Cryptocurrency trading and leverage are extremely risky.
-- **NO GUARANTEES**: Past performance does not indicate future results.
-- **YOUR RESPONSIBILITY**: You are solely responsible for your trading decisions.
-
-**The authors are not responsible for any financial losses.**
+- [x] Backtesting sur données historiques
+- [x] Paper trading avec simulateur d'exchange
+- [x] Optimisation multi-paramètres avec analyse des patterns
+- [x] DataLoader robuste avec validation OHLC
+- [x] Génération de données synthétiques reproductibles
+- [ ] Connecteurs exchange live (Binance, Bitget)
+- [ ] Dashboard web de monitoring
+- [ ] Support multi-actifs
+- [ ] Alertes Telegram
+- [ ] Ajustement dynamique des paramètres en live
 
 ---
 
-## 📄 License
+## Avertissement
 
-MIT License - see [LICENSE](LICENSE) file.
+**CE LOGICIEL EST À DES FINS ÉDUCATIVES UNIQUEMENT.**
 
----
-
-## 🙏 Acknowledgments
-
-Inspired by:
-- MiniTorch (Sasha Rush) - Educational ML frameworks
-- TinyGrad (George Hotz) - Performance-focused design
-- Grid trading strategies from traditional finance
+- **PAS DE CONSEIL FINANCIER** : Ne pas utiliser avec de l'argent réel sans tests approfondis.
+- **RISQUE ÉLEVÉ** : Le trading de crypto et le levier sont extrêmement risqués.
+- **AUCUNE GARANTIE** : Les performances passées n'indiquent pas les résultats futurs.
+- **VOTRE RESPONSABILITÉ** : Vous êtes seul responsable de vos décisions de trading.
 
 ---
 
-## 📞 Support
+## Licence
 
-- **Issues**: [GitHub Issues](https://github.com/YOUR_USERNAME/sol-grid-bot/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/YOUR_USERNAME/sol-grid-bot/discussions)
+MIT — voir [LICENSE](LICENSE)
 
 ---
 
-**Built with ❤️ for the SOL community.**
+## Contributing
+
+1. Fork le repo
+2. Créer une branche : `git checkout -b feature/ma-feature`
+3. Commit : `git commit -m "feat: ajouter ma feature"`
+4. Push : `git push origin feature/ma-feature`
+5. Ouvrir une Pull Request
