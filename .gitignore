@@ -39,6 +39,7 @@ venv/
 env/
 ENV/
 .venv/
+.venv_papertrading/
 .env
 .direnv
 .pre-commit-config.yaml
